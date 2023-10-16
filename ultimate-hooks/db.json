@@ -1,0 +1,33 @@
+{
+  "notes": [
+    {
+      "content": "custom-hooks are awesome!",
+      "id": "47145"
+    },
+    {
+      "content": "best feature ever <3",
+      "id": "21149"
+    },
+    {
+      "content": "xd",
+      "id": "c9W3GfY"
+    }
+  ],
+  "persons": [
+    {
+      "name": "jessica",
+      "number": "91-123-4342432",
+      "id": "23456"
+    },
+    {
+      "name": "mluukkai",
+      "number": "040-5483923",
+      "id": "78906"
+    },
+    {
+      "name": "luis",
+      "number": "661233412",
+      "id": "lY5pnLu"
+    }
+  ]
+}
