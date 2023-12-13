@@ -5,4 +5,4 @@ const login = async (credentials) => {
   return request.then((response) => response.data);
 };
 
-export default { login };
+export default login;

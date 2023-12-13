@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import Blog from './components/Blog';
 import blogService from './services/blogs';
-import loginService from './services/login';
 import LoginForm from './components/LoginForm';
 import NewBlogForm from './components/NewBlogForm';
 import Notification from './components/Notification';
@@ -14,12 +13,13 @@ import {
   deleteBlog,
 } from './reducers/blogReducer';
 import { setNotification } from './reducers/notificationReducer';
+import { logOut, loginUser } from './reducers/userReducer';
 
 const App = () => {
   const blogs = useSelector((state) => state.blogs);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [user, setUser] = useState(null);
+  const userInfo = useSelector((state) => state.user);
 
   const dispatch = useDispatch();
 
@@ -30,37 +30,25 @@ const App = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    const loggedUserStr = window.localStorage.getItem('loggedUser');
-    if (loggedUserStr) {
-      const loggedUser = JSON.parse(loggedUserStr);
-      setUser(loggedUser);
-      blogService.setToken(loggedUser.token);
+    if (userInfo) {
+      blogService.setToken(userInfo.token);
     }
-  }, []);
+  }, [userInfo]);
 
-  function handleLogin(event) {
+  async function handleLogin(event) {
     event.preventDefault();
-    loginService
-      .login({
-        username,
-        password,
-      })
-      .then((user) => {
-        setUser(user);
-        blogService.setToken(user.token);
-        window.localStorage.setItem('loggedUser', JSON.stringify(user));
-        dispatch(setNotification('Logged in successfully', 'success', 5));
-        setUsername('');
-        setPassword('');
-      })
-      .catch(() => {
-        dispatch(setNotification('Wrong username or password', 'error', 5));
-      });
+    try {
+      await dispatch(loginUser({ username, password })).unwrap();
+      dispatch(setNotification('Logged in successfully', 'success', 5));
+      setUsername('');
+      setPassword('');
+    } catch (error) {
+      dispatch(setNotification(error, 'error', 5));
+    }
   }
 
-  function handleLogout(event) {
-    window.localStorage.removeItem('loggedUser');
-    setUser(null);
+  function handleLogout() {
+    dispatch(logOut());
     dispatch(setNotification('Logged out successfully', 'success', 5));
   }
 
@@ -118,10 +106,10 @@ const App = () => {
   return (
     <div>
       <Notification />
-      {user ? (
+      {userInfo ? (
         <div>
           <h2>blogs</h2>
-          <p>{user.name} logged in</p>
+          <p>{userInfo.name} logged in</p>
           <button onClick={handleLogout}>Log out</button>
           <Togglable buttonLabel="new blog" ref={blogFormRef}>
             <NewBlogForm handleCreateNewBlog={handleAddNewBlog} />
@@ -131,7 +119,7 @@ const App = () => {
               key={blog.id}
               blog={blog}
               handleLike={handleLike}
-              removable={user.username === blog.user.username}
+              removable={userInfo.username === blog.user.username}
               handleBlogDeletion={handleBlogDeletion}
             />
           ))}
