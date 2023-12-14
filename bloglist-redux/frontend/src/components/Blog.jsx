@@ -1,27 +1,25 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Accordion } from 'react-bootstrap';
 
 const Blog = ({ blog, handleLike, removable, handleBlogDeletion }) => {
-  const [showFullDetails, setShowFullDetails] = useState(false);
-
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5,
-  };
+  // const blogStyle = {
+  //   paddingTop: 10,
+  //   paddingLeft: 2,
+  //   border: 'solid',
+  //   borderWidth: 1,
+  //   marginBottom: 5,
+  // };
 
   return (
-    <div className="blog" style={blogStyle}>
-      {blog.title} {blog.author}
-      <button
-        className="toggle-btn"
-        onClick={() => setShowFullDetails(!showFullDetails)}
-      >
-        {showFullDetails ? 'hide' : 'view'}
-      </button>
-      {showFullDetails && (
-        <div className="togglable-content">
+    <Accordion.Item eventKey={`${blog.id}`}>
+      <Accordion.Header>
+        <Link to={`/blogs/${blog.id}`}>
+          {blog.title} {blog.author}
+        </Link>
+      </Accordion.Header>
+      <Accordion.Body>
+        <div>
           <a
             href={blog.url}
             target="_blank"
@@ -48,8 +46,8 @@ const Blog = ({ blog, handleLike, removable, handleBlogDeletion }) => {
             </button>
           )}
         </div>
-      )}
-    </div>
+      </Accordion.Body>
+    </Accordion.Item>
   );
 };
 

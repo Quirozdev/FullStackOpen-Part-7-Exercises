@@ -1,29 +1,24 @@
-import { useState, useEffect, useRef } from 'react';
-import Blog from './components/Blog';
+import { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import blogService from './services/blogs';
 import LoginForm from './components/LoginForm';
-import NewBlogForm from './components/NewBlogForm';
 import Notification from './components/Notification';
-import Togglable from './components/Togglable';
 import { useSelector, useDispatch } from 'react-redux';
-import {
-  initializeBlogs,
-  createBlog,
-  likeBlog,
-  deleteBlog,
-} from './reducers/blogReducer';
+import { initializeBlogs } from './reducers/blogReducer';
 import { setNotification } from './reducers/notificationReducer';
 import { logOut, loginUser } from './reducers/userReducer';
+import Users from './components/Users';
+import Home from './components/Home';
+import User from './components/User';
+import BlogPage from './components/BlogPage';
+import { Button, Container, Nav, Navbar } from 'react-bootstrap';
 
 const App = () => {
-  const blogs = useSelector((state) => state.blogs);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const userInfo = useSelector((state) => state.user);
 
   const dispatch = useDispatch();
-
-  const blogFormRef = useRef();
 
   useEffect(() => {
     dispatch(initializeBlogs());
@@ -52,77 +47,42 @@ const App = () => {
     dispatch(setNotification('Logged out successfully', 'success', 5));
   }
 
-  async function handleAddNewBlog(blogObject) {
-    try {
-      await dispatch(createBlog(blogObject)).unwrap();
-      dispatch(
-        setNotification(
-          `a new blog ${blogObject.title} by ${blogObject.author} added`,
-          'success',
-          5
-        )
-      );
-    } catch (error) {
-      dispatch(setNotification(error, 'error', 5));
-    }
-
-    blogFormRef.current.toggleVisibility();
-  }
-
-  function handleLike(blog) {
-    try {
-      dispatch(likeBlog(blog)).unwrap();
-      dispatch(setNotification(`Blog ${blog.title} liked`, 'success', 5));
-    } catch (error) {
-      dispatch(setNotification(error, 'error', 5));
-    }
-  }
-
-  async function handleBlogDeletion(blogToDelete) {
-    if (
-      window.confirm(
-        `Remove blog ${blogToDelete.title} by ${blogToDelete.author}`
-      )
-    ) {
-      try {
-        await dispatch(deleteBlog(blogToDelete)).unwrap();
-        dispatch(
-          setNotification(
-            `${blogToDelete.title} by ${blogToDelete.author} deleted`,
-            'success',
-            5
-          )
-        );
-      } catch (error) {
-        dispatch(setNotification(error, 'error', 5));
-      }
-    }
-  }
-
-  const blogsSortedByLikes = [...blogs].sort((a, b) => {
-    return b.likes - a.likes;
-  });
-
   return (
     <div>
       <Notification />
       {userInfo ? (
         <div>
-          <h2>blogs</h2>
-          <p>{userInfo.name} logged in</p>
-          <button onClick={handleLogout}>Log out</button>
-          <Togglable buttonLabel="new blog" ref={blogFormRef}>
-            <NewBlogForm handleCreateNewBlog={handleAddNewBlog} />
-          </Togglable>
-          {blogsSortedByLikes.map((blog) => (
-            <Blog
-              key={blog.id}
-              blog={blog}
-              handleLike={handleLike}
-              removable={userInfo.username === blog.user.username}
-              handleBlogDeletion={handleBlogDeletion}
-            />
-          ))}
+          <Router>
+            <Navbar expand="lg" bg="dark" data-bs-theme="dark">
+              <Container>
+                <Navbar.Brand href="/">Blog App</Navbar.Brand>
+                <Navbar.Toggle aria-controls="basic-navbar-nav" />
+                <Navbar.Collapse
+                  id="basic-navbar-nav"
+                  className="justify-content-end"
+                >
+                  <Nav>
+                    <Nav.Link href="#" as="span">
+                      <Link to="/">Blogs</Link>
+                    </Nav.Link>
+                    <Nav.Link href="#" as="span">
+                      <Link to="/users">Users</Link>
+                    </Nav.Link>
+                    <Navbar.Text>{userInfo.name} logged in</Navbar.Text>
+                    <Button variant="outline-success" onClick={handleLogout}>
+                      Log out
+                    </Button>
+                  </Nav>
+                </Navbar.Collapse>
+              </Container>
+            </Navbar>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/users" element={<Users />}></Route>
+              <Route path="/users/:id" element={<User />}></Route>
+              <Route path="/blogs/:id" element={<BlogPage />}></Route>
+            </Routes>
+          </Router>
         </div>
       ) : (
         <LoginForm

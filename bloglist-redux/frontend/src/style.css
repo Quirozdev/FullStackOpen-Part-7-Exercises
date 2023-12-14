@@ -2,10 +2,21 @@
   box-sizing: border-box;
 }
 
+.navbar {
+  background-color: lightgray;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding-left: 24px;
+}
+
 .notification {
   font-weight: bold;
   font-size: 20px;
   text-align: center;
+  position: absolute;
+  z-index: 3;
+  width: 100%;
 }
 
 .success {
@@ -30,4 +41,10 @@
 
 .remove-btn:hover {
   background-color: #af1512;
+}
+
+.justify-content-end {
+  display: flex;
+  justify-content: end;
+  gap: 32px;
 }

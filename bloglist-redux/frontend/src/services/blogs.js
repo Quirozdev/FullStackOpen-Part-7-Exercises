@@ -12,6 +12,11 @@ const getAll = () => {
   return request.then((response) => response.data);
 };
 
+const getSpecificBlog = (id) => {
+  const request = axios.get(`${baseUrl}/${id}`);
+  return request.then((response) => response.data);
+};
+
 const create = (newBlog) => {
   const request = axios.post(baseUrl, newBlog, {
     headers: {
@@ -51,4 +56,27 @@ const deleteBlog = (blogId) => {
   return request;
 };
 
-export default { getAll, setToken, create, likeBlog, deleteBlog };
+const addComment = (blogId, comment) => {
+  const request = axios.post(
+    `${baseUrl}/${blogId}/comments`,
+    {
+      text: comment,
+    },
+    {
+      headers: {
+        Authorization: token,
+      },
+    }
+  );
+  return request.then((response) => response.data);
+};
+
+export default {
+  getAll,
+  getSpecificBlog,
+  setToken,
+  create,
+  likeBlog,
+  deleteBlog,
+  addComment,
+};
